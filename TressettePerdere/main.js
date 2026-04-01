@@ -1,21 +1,19 @@
-// main.js - entry point di Electron
 const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
 function createWindow() {
-
-  // Prendi dimensioni dello schermo
-  const { width, height } = require('electron').screen.getPrimaryDisplay().workAreaSize;
-
   const win = new BrowserWindow({
-    width: width,
-    height: height,
+    width: 1600,
+    height: 960,
+    minWidth: 1200,
+    minHeight: 760,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     }
   });
 
-  win.loadFile('index.html');
+  win.loadFile(path.join(__dirname, 'index.html'));
 }
 
 app.whenReady().then(createWindow);

@@ -1,22 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Tressette a Perdere</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tresette a Perdere</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Tressette a Perdere</h1>
-  <div id="game-table">
-    <div class="player" id="player-top">Giocatore 1</div>
-    <div class="player" id="player-left">Giocatore 2</div>
-    <div class="center" id="center-table">Centro Tavolo</div>
-    <div class="player" id="player-right">Giocatore 3</div>
-    <div class="player" id="player-bottom">Tu
-      <div class="hand" id="player-hand"></div>
-    </div>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>Tresette a Perdere</h1>
+        <p class="subtitle">Partite online 4 giocatori con regole ufficiali e Asso Bastardo.</p>
+      </div>
+      <div id="status-pill" class="pill">Non connesso</div>
+    </header>
+
+    <section class="setup-panel card-panel">
+      <div class="panel-grid">
+        <div class="field-group">
+          <label for="player-name">Nome giocatore</label>
+          <input id="player-name" maxlength="20" placeholder="Es. Mario" />
+        </div>
+
+        <div class="field-group">
+          <label for="point-limit">Limite punti torneo</label>
+          <input id="point-limit" type="number" min="10" max="300" value="41" />
+        </div>
+      </div>
+
+      <div class="setup-actions">
+        <button id="host-btn" class="primary">Crea tavolo (Host)</button>
+        <input id="join-url" placeholder="ws://IP-PUBBLICO:7070" />
+        <button id="join-btn">Unisciti</button>
+      </div>
+
+      <div class="network-note">
+        <strong>Hosting remoto:</strong> per amici da altre reti apri/forwarda la porta 7070 sul router verso il tuo PC e condividi l'URL ws://IP:7070.
+      </div>
+
+      <div id="host-url" class="host-url hidden"></div>
+      <div id="lobby-status" class="lobby-status">In attesa di una lobby...</div>
+      <button id="start-match-btn" class="success hidden">Avvia partita (4/4)</button>
+    </section>
+
+    <main class="game-layout">
+      <section class="table-panel card-panel">
+        <div class="player-slot top" id="slot-top"></div>
+        <div class="player-slot left" id="slot-left"></div>
+        <div class="player-slot right" id="slot-right"></div>
+        <div class="player-slot bottom" id="slot-bottom"></div>
+
+        <div class="table-center" id="table-center">
+          <div class="round-info">
+            <span id="turn-indicator">Nessun turno attivo</span>
+            <span id="trick-indicator">Mano 0/10</span>
+          </div>
+          <div id="trick-cards" class="trick-cards"></div>
+        </div>
+
+        <div id="player-hand" class="player-hand"></div>
+      </section>
+
+      <aside class="side-panel">
+        <section class="card-panel">
+          <h2>Regole attive</h2>
+          <ul class="rules-list">
+            <li>4 giocatori obbligatori per iniziare.</li>
+            <li>Obbligo di rispondere al seme se possibile.</li>
+            <li>Ordine prese Tresette: 3 &gt; 2 &gt; Asso &gt; Re &gt; Cavallo &gt; Fante &gt; 7 &gt; 6 &gt; 5 &gt; 4.</li>
+            <li>Punti carta: Asso=1, 2/3/Re/Cavallo/Fante=1/3, altre=0.</li>
+            <li><strong>Asso di Bastoni (Asso Bastardo) = 11 punti.</strong></li>
+            <li>Vince il torneo chi ha <strong>meno punti</strong> quando qualcuno raggiunge il limite.</li>
+          </ul>
+        </section>
+
+        <section class="card-panel">
+          <h2>Leaderboard torneo</h2>
+          <div id="leaderboard"></div>
+        </section>
+
+        <section class="card-panel">
+          <h2>Log partita</h2>
+          <div id="event-log" class="event-log"></div>
+        </section>
+      </aside>
+    </main>
   </div>
-  <button id="new-game-btn">Nuova Partita</button>
+
   <script src="renderer.js"></script>
 </body>
 </html>
