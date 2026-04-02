@@ -130,6 +130,26 @@ function getLocalIPv4() {
   return '127.0.0.1';
 }
 
+function getTailscaleIP() {
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    if (name.toLowerCase().startsWith('tailscale')) {
+      for (const n of nets[name] || []) {
+        if (n.family === 'IPv4') return n.address;
+      }
+    }
+  }
+  for (const name of Object.keys(nets)) {
+    for (const n of nets[name] || []) {
+      if (n.family === 'IPv4' && !n.internal) {
+        const parts = n.address.split('.').map(Number);
+        if (parts.length === 4 && parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return n.address;
+      }
+    }
+  }
+  return null;
+}
+
 function send(ws, payload) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(payload));
 }
@@ -580,11 +600,16 @@ function setupHost() {
   };
 
   wss = new WebSocketServer({ port: DEFAULT_PORT });
-  const ip = getLocalIPv4();
+  const tailscaleIp = getTailscaleIP();
+  const ip = tailscaleIp || getLocalIPv4();
   hostUrlEl.classList.remove('hidden');
-  hostUrlEl.textContent = `Condividi URL: ws://${ip}:${DEFAULT_PORT}`;
-
-  addLog('Server host avviato su porta 7070.', 'good');
+  if (tailscaleIp) {
+    hostUrlEl.textContent = `Condividi URL (Tailscale): ws://${ip}:${DEFAULT_PORT}`;
+    addLog(`Server host avviato su porta ${DEFAULT_PORT}. IP Tailscale rilevato: ${ip}`, 'good');
+  } else {
+    hostUrlEl.textContent = `Condividi URL: ws://${ip}:${DEFAULT_PORT}`;
+    addLog(`Server host avviato su porta ${DEFAULT_PORT}. Tailscale non rilevato, usando IP locale.`, 'warn');
+  }
 
   wss.on('connection', (ws) => {
     let joinedPlayerId = null;
