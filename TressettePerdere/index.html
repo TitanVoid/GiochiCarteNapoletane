@@ -31,12 +31,12 @@
 
       <div class="setup-actions">
         <button id="host-btn" class="primary">Crea tavolo (Host)</button>
-        <input id="join-url" placeholder="ws://IP-PUBBLICO:7070" />
+        <input id="join-url" placeholder="ws://100.x.x.x:7070" />
         <button id="join-btn">Unisciti</button>
       </div>
 
       <div class="network-note">
-        <strong>Hosting remoto:</strong> per amici da altre reti apri/forwarda la porta 7070 sul router verso il tuo PC e condividi l'URL ws://IP:7070.
+        <strong>Hosting remoto con Tailscale:</strong> installa <a href="https://tailscale.com" target="_blank">Tailscale</a> su tutti i dispositivi e accedi con lo stesso account (o usa lo stesso tailnet). L'host condividerà automaticamente il suo IP Tailscale (100.x.x.x); gli altri giocatori incollano quell'URL nel campo "Unisciti". Non è necessario aprire porte sul router.
       </div>
 
       <div id="host-url" class="host-url hidden"></div>

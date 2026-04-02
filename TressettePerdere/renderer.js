@@ -120,7 +120,31 @@ function sortHand(hand) {
   });
 }
 
+function isTailscaleAddress(address) {
+  const parts = address.split('.').map(Number);
+  return parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127;
+}
+
+function getTailscaleIPv4() {
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    if (/tailscale/i.test(name)) {
+      for (const n of nets[name] || []) {
+        if (n.family === 'IPv4' && !n.internal) return n.address;
+      }
+    }
+  }
+  for (const name of Object.keys(nets)) {
+    for (const n of nets[name] || []) {
+      if (n.family === 'IPv4' && !n.internal && isTailscaleAddress(n.address)) return n.address;
+    }
+  }
+  return null;
+}
+
 function getLocalIPv4() {
+  const tailscaleIP = getTailscaleIPv4();
+  if (tailscaleIP) return tailscaleIP;
   const nets = os.networkInterfaces();
   for (const name of Object.keys(nets)) {
     for (const n of nets[name] || []) {
@@ -584,7 +608,11 @@ function setupHost() {
   hostUrlEl.classList.remove('hidden');
   hostUrlEl.textContent = `Condividi URL: ws://${ip}:${DEFAULT_PORT}`;
 
-  addLog('Server host avviato su porta 7070.', 'good');
+  if (isTailscaleAddress(ip)) {
+    addLog(`Server host avviato su Tailscale (${ip}:${DEFAULT_PORT}).`, 'good');
+  } else {
+    addLog('Server host avviato. Tailscale non rilevato: installa Tailscale per giocare online senza port forwarding.', 'warn');
+  }
 
   wss.on('connection', (ws) => {
     let joinedPlayerId = null;
@@ -715,7 +743,7 @@ function connectAsClient() {
 
   wsClient.onerror = () => {
     setStatus('Errore connessione', '#7f1d1d');
-    addLog('Errore di rete: controlla URL e porta aperta.', 'warn');
+    addLog('Errore di rete: controlla URL e che Tailscale sia attivo su entrambi i dispositivi.', 'warn');
   };
 }
 
